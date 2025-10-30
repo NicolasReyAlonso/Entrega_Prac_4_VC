@@ -1,0 +1,6 @@
+train: ./Matriculas/train/images
+val: ./Matriculas/validation/images
+test: ./Matriculas/test/images
+
+nc: 1
+names: ['matricula']
