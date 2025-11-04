@@ -60,6 +60,8 @@ El script:
   * Un CSV con las detecciones: `detecciones_yolo_tracking_sinOCR.csv`
 * Muestra por pantalla los totales detectados por clase.
 
+El resultado se encuentra en el video **VC_P4**
+
 **Ejemplo de salida CSV:**
 
 | fotograma | tipo_objeto | confianza | id_tracking | x1  | y1  | x2  | y2  |
@@ -70,6 +72,21 @@ El script:
 ---
 
 ### 2. Entrenamiento del modelo de matrículas
+
+Se entrenó un modelo **YOLOv8 nano** (`yolov8n.pt`) para detectar matrículas de vehículos utilizando la librería **Ultralytics** y aceleración por GPU con **DirectML**.
+
+### Configuración
+- Imágenes: `416×416`
+- Épocas: `10`
+- Batch size: `4`
+- Dispositivo: `DirectML` (`torch_directml`)
+- Nombre del experimento: `matriculas_detector2`
+
+### Dataset
+Se utilizó un conjunto de datos de matrículas disponible en [Kaggle](https://www.kaggle.com/) con anotaciones en formato YOLO, descrito en el archivo `data.yaml`.
+
+### Resultado
+El modelo entrenado se guarda en `runs/detect/matriculas_detector2/` y está listo para realizar inferencias sobre imágenes o vídeos que contengan matrículas.
 
 
 
