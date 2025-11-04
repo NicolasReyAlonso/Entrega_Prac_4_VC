@@ -61,13 +61,6 @@ El script:
 
 El resultado se encuentra en el video **VC_P4**
 
-**Ejemplo de salida CSV:**
-
-| fotograma | tipo_objeto | confianza | id_tracking | x1  | y1  | x2  | y2  |
-| --------- | ----------- | --------- | ----------- | --- | --- | --- | --- |
-| 1         | person      | 0.88      | 3           | 140 | 220 | 300 | 600 |
-| 1         | car         | 0.93      | 5           | 420 | 250 | 680 | 580 |
-
 ---
 
 ### 2. Entrenamiento del modelo de matrículas
@@ -85,7 +78,7 @@ Se entrenó un modelo **YOLOv8 nano** (`yolov8n.pt`) para detectar matrículas d
 Se utilizó un conjunto de datos de matrículas disponible en [Kaggle](https://www.kaggle.com/) con anotaciones en formato YOLO, descrito en el archivo `data.yaml`.
 
 ### Resultado
-El modelo entrenado se guarda en `runs/detect/matriculas_detector2/` y está listo para realizar inferencias sobre imágenes o vídeos que contengan matrículas.
+El modelo entrenado se guarda en `runs/detect/matriculas_detector2/`.
 
 
 
