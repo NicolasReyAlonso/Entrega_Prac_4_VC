@@ -29,7 +29,6 @@ Este proyecto desarrolla un **prototipo de visión artificial** capaz de **detec
    ```bash
    git clone https://github.com/NicolasReyAlonso/Entrega_Prac_4_VC.git
    cd yolo-tracking-matriculas
-````
 
 2. **Instalar dependencias:**
 
