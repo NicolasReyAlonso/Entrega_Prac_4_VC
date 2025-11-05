@@ -1,6 +1,6 @@
-train: ./Matriculas/train/images
-val: ./Matriculas/validation/images
-test: ./Matriculas/test/images
+train: /Users/nicolasreyalonso/.cache/kagglehub/datasets/sujaymann/car-number-plate-dataset-yolo-format/versions/3/License-Plate-Data/train/images
+val: /Users/nicolasreyalonso/.cache/kagglehub/datasets/sujaymann/car-number-plate-dataset-yolo-format/versions/3/License-Plate-Data/test/images
+test: /Users/nicolasreyalonso/.cache/kagglehub/datasets/sujaymann/car-number-plate-dataset-yolo-format/versions/3/License-Plate-Data/test/images
 
 nc: 1
 names: ['matricula']
