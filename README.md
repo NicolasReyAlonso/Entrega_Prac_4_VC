@@ -21,67 +21,120 @@ Este proyecto desarrolla un **prototipo de visión artificial** capaz de **detec
 - **Torch / Torch DirectML** → Aceleración con GPU AMD o CPU.  
 - **CSV / defaultdict** → Registro de resultados.  
 
+
+##  1. Dataset
+
+Se descarga un **conjunto de datos de matrículas** en formato YOLO desde [Kaggle](https://www.kaggle.com/), mediante la librería `kagglehub`.
+
+```python
+import kagglehub
+path = kagglehub.dataset_download("sujaymann/car-number-plate-dataset-yolo-format")
+print("Path to dataset files:", path)
+````
+
+Este dataset sirve para **entrenar un modelo YOLO personalizado** que será capaz de detectar matrículas en imágenes reales.
+
+
+
+##  2. Detección y seguimiento de personas y vehículos
+
+En este bloque se crea un **prototipo de detección y seguimiento** de personas y coches en vídeos propios, utilizando el modelo **YOLOv11n** y el método `track()`.
+
+* Se guardan los resultados en un vídeo anotado (`salida_yolo_tracking_sinOCR.mp4`). El video resultante `VC_P4.mp4`.
+* Se genera un archivo CSV (`detecciones_yolo_tracking_sinOCR.csv`) con los objetos detectados y su ID de seguimiento.
+
+
+##  3. Entrenamiento de un modelo YOLO personalizado
+
+Se entrena un modelo YOLO para detectar **únicamente matrículas** usando el dataset descargado.
+El archivo `data.yaml` define las rutas de entrenamiento, validación y las clases disponibles.
+
+```python
+from ultralytics import YOLO
+model = YOLO("yolo11n.pt")
+
+model.train(
+    data="data.yaml",
+    imgsz=416,
+    epochs=10,
+    batch=4,
+    device="mps",
+    name="matriculas_detector2"
+)
+```
+Los resultados se encuentran en la carpeta `/runs`.
+
+
+##  4. Detección de vehículos en vídeos propios
+
+Se utiliza el modelo YOLO para detectar **vehículos en movimiento** y extraer su región inferior,
+donde generalmente se ubica la matrícula.
+
+Si está disponible **EasyOCR**, se realiza lectura preliminar de las matrículas detectadas.
+El proceso genera:
+
+* `salida_simple.mp4` → vídeo anotado
+* `detecciones_simple.csv` → resultados
+
 ---
 
-## ⚙️ Instalación
+## 5. Lectura de matrículas detectadas con EasyOCR
 
-1. **Clonar el repositorio o descargar el proyecto:**
-   ```bash
-   git clone https://github.com/NicolasReyAlonso/Entrega_Prac_4_VC.git
-   cd yolo-tracking-matriculas
+En esta etapa se aplican técnicas de OCR sobre las imágenes generadas por el detector YOLO.
+Para cada imagen:
 
-2. **Instalar dependencias:**
+* Se recorta la región de la matrícula.
+* Se mejora el contraste y se aplica **EasyOCR**.
+* Los resultados se guardan en `lecturas_matriculas.csv`.
 
-   ```bash
-   pip install ultralytics opencv-python torch torchvision torchaudio torch-directml
-   ```
-
-3. **Descargar los modelos YOLO preentrenados:**
-
-   * Por defecto el script usa `yolo11n.pt` o `yolov8n.pt`.
-   * Estos se descargan automáticamente la primera vez que se ejecuta el código.
 
 ---
 
-## 🎬 Uso
+## 6. Lectura de matrículas detectadas con Tesseract OCR
 
-### 1. Detección y seguimiento en vídeos
+Se repite el proceso anterior usando **Tesseract**, aplicando un preprocesado más avanzado (filtro bilateral, ecualización y binarización).
 
-Edita las variables del script principal (`video_path`, `output_video_path`, etc.) y ejecuta.
+Se guarda cada lectura en `lecturas_matriculas_tesseract.csv` junto con el tiempo medio de inferencia.
 
-El script:
 
-* Detecta **personas (class 0)** y **coches (class 2)**.
-* Realiza **seguimiento de IDs** a lo largo de los fotogramas.
-* Genera:
+## 7. Evaluación de precisión y similitud
 
-  * Un vídeo anotado: `salida_yolo_tracking_sinOCR.mp4`
-  * Un CSV con las detecciones: `detecciones_yolo_tracking_sinOCR.csv`
-* Muestra por pantalla los totales detectados por clase.
+Los resultados de ambos OCRs se comparan en base a:
 
-El resultado se encuentra en el video **VC_P4**
+* **Precisión exacta (%)** → lecturas que coinciden exactamente con la matrícula real.
+* **Similitud media (%)** → semejanza entre la lectura y la matrícula real usando la distancia de Levenshtein.
+
+Ejemplo de resultados en consola:
+
+```
+📊 Comparativa OCR de matrículas
+================================
+Imágenes evaluadas: 30
+
+🟩 EasyOCR
+ - Precisión exacta: 0.00%
+ - Similitud media:  20.72%
+
+🟦 Tesseract
+ - Precisión exacta: 0.00%
+ - Similitud media:  16.67%
+
+🏁 Modelo con más aciertos: Empate
+```
 
 ---
 
-### 2. Entrenamiento del modelo de matrículas
+##  8. Gráfica comparativa de rendimiento de OCRs
 
-Se entrenó un modelo **YOLOv8 nano** (`yolov8n.pt`) para detectar matrículas de vehículos utilizando la librería **Ultralytics** y aceleración por GPU con **DirectML**.
+Finalmente, se genera una **gráfica comparativa** (`comparativa_ocr.png`) que representa:
 
-### Configuración
-- Imágenes: `416×416`
-- Épocas: `10`
-- Batch size: `4`
-- Dispositivo: `DirectML` (`torch_directml`)
-- Nombre del experimento: `matriculas_detector2`
+* En barras: la **similitud media (%)** de EasyOCR y Tesseract.
+* En línea naranja: el **tiempo medio de inferencia (ms)**.
 
-### Dataset
-Se utilizó un conjunto de datos de matrículas disponible en [Kaggle](https://www.kaggle.com/) con anotaciones en formato YOLO, descrito en el archivo `data.yaml`.
+Esta gráfica permite visualizar de forma conjunta el equilibrio entre **precisión** y **velocidad** de ambos OCRs.
 
-### Resultado
-El modelo entrenado se guarda en `runs/detect/matriculas_detector2/`.
+---
 
+## Resultado
 
-
-
-
-
+![Comparativa de OCRs](comparativa_ocr.png)
